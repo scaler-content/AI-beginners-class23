@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 23 · AWS for AI Apps — Hands-On Deployment Lab — Chapter One Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300..800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0f14;--bg2:#12161d;--card:#161b24;--card2:#1b212c;--line:#262e3b;--line2:#33405266;
+  --ink:#eef2f7;--ink2:#aab6c6;--ink3:#6d7a8c;
+  --orange:#ff8a2a;--orange2:#ffb066;--orange-dim:#ff8a2a22;
+  --teal:#3dd6c3;--teal-dim:#3dd6c31f;--violet:#a48bff;--violet-dim:#a48bff1f;
+  --gold:#ffd166;--rose:#ff6b8b;--green:#5fe08a;--red:#ff6161;
+  --mono:'JetBrains Mono',monospace;--serif:'Fraunces',serif;--sans:'Manrope',sans-serif;--r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.7;-webkit-font-smoothing:antialiased}
+::selection{background:var(--orange);color:#111}
+.wrap{max-width:1020px;margin:0 auto;padding:0 26px}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:600;line-height:1.22}
+a{color:var(--orange2)}
+strong{color:var(--ink)}
+em{color:var(--orange2);font-style:normal}
+p{color:var(--ink2)}
+p strong{color:var(--ink)}
+#progressBar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--orange),var(--gold));width:0;z-index:999;transition:width .1s linear}
+.topnav{position:sticky;top:0;background:#0c0f14e8;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);z-index:900}
+.topnav .wrap{display:flex;align-items:center;gap:14px;padding-top:12px;padding-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.topnav .wrap::-webkit-scrollbar{display:none}
+.brand{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--orange);white-space:nowrap}
+.topnav a.nl{font-size:12.5px;font-weight:600;color:var(--ink3);text-decoration:none;white-space:nowrap;padding:5px 10px;border-radius:20px;transition:.2s}
+.topnav a.nl:hover{color:var(--orange);background:var(--orange-dim)}
+.hero{position:relative;padding:88px 0 70px;overflow:hidden;background:radial-gradient(1100px 480px at 78% -12%,#ff8a2a14,transparent 60%),radial-gradient(800px 400px at 8% 110%,#3dd6c30e,transparent 60%)}
+.hero .eyebrow{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
+.chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.06em;padding:6px 13px;border-radius:100px;border:1px solid var(--line);color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:#ff8a2a55;color:var(--orange2);background:var(--orange-dim)}
+.chip.cool{border-color:#3dd6c355;color:var(--teal);background:var(--teal-dim)}
+.hero h1{font-size:clamp(38px,6vw,64px);font-weight:640;letter-spacing:-.01em;margin-bottom:8px}
+.hero h1 .amp{color:var(--orange);font-style:italic;font-weight:500}
+.hero .sub{font-size:clamp(17px,2.2vw,21px);color:var(--ink2);max-width:740px;margin-top:16px}
+.hero .sub b{color:var(--ink)}
+.heroStats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:44px}
+.hstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.hstat .n{font-family:var(--serif);font-size:30px;font-weight:640;color:var(--orange)}
+.hstat .l{font-size:12px;color:var(--ink3);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+@media(max-width:760px){.heroStats{grid-template-columns:repeat(2,1fr)}}
+.agenda{margin-top:50px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 28px}
+.agenda h3{font-size:14px;font-family:var(--sans);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:18px}
+.agRow{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:11px 0;border-bottom:1px dashed var(--line)}
+.agRow:last-child{border-bottom:none}
+.agRow .t{font-family:var(--mono);font-size:12px;color:var(--orange);min-width:86px;font-weight:500}
+.agRow .name{font-weight:600;font-size:15px;color:var(--ink);flex:1;min-width:180px}
+.agRow .tag{margin-left:auto;font-size:11px;font-family:var(--mono);color:var(--ink3);border:1px solid var(--line);padding:3px 10px;border-radius:100px;white-space:nowrap}
+.agRow .tag.simtag{color:var(--teal);border-color:#3dd6c344}
+section.blk{padding:74px 0 30px}
+.secHead{display:flex;align-items:baseline;gap:18px;margin-bottom:8px;flex-wrap:wrap}
+.secNum{font-family:var(--mono);font-size:13px;color:var(--orange);border:1px solid #ff8a2a55;background:var(--orange-dim);padding:5px 13px;border-radius:100px;font-weight:500;white-space:nowrap}
+.secHead h2{font-size:clamp(28px,4vw,40px);letter-spacing:-.01em}
+.secTime{font-family:var(--mono);font-size:12px;color:var(--ink3);margin-left:auto;white-space:nowrap}
+.secLede{font-size:18px;color:var(--ink2);max-width:800px;margin:12px 0 34px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:44px 0 0}
+.say{position:relative;background:linear-gradient(180deg,#1a1410,#161b24);border:1px solid #ff8a2a33;border-left:3px solid var(--orange);border-radius:14px;padding:20px 24px 20px 26px;margin:22px 0}
+.say .who{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);font-weight:700;margin-bottom:10px}
+.say p{color:#e8dccb;font-size:15.5px;margin-bottom:10px}
+.say p:last-child{margin-bottom:0}
+.say.ask{border-left-color:var(--teal);border-color:#3dd6c333;background:linear-gradient(180deg,#101a19,#161b24)}
+.say.ask .who{color:var(--teal)}
+.say.do{border-left-color:var(--violet);border-color:#a48bff33;background:linear-gradient(180deg,#141021,#161b24)}
+.say.do .who{color:var(--violet)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px 26px;margin:20px 0}
+.card h3{font-size:21px;margin-bottom:10px}
+.card h4{font-size:17px;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:820px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+.defBox{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin:20px 0;position:relative}
+.defBox::before{content:'DEFINITION';position:absolute;top:-10px;left:20px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--gold);background:var(--bg);padding:2px 10px;border:1px solid #ffd16644;border-radius:100px}
+.defBox .term{font-family:var(--serif);font-size:19px;color:var(--gold);font-weight:600}
+.defBox p{margin-top:6px;font-size:15.5px}
+.useCase{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;transition:.25s;position:relative;overflow:hidden}
+.useCase:hover{border-color:#ff8a2a66;transform:translateY(-3px)}
+.useCase .ico{font-size:26px;margin-bottom:8px}
+.useCase .co{font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.useCase h4{font-size:16px;margin:4px 0 6px;font-family:var(--sans);font-weight:700}
+.useCase p{font-size:13.5px;color:var(--ink2);line-height:1.55}
+.analogy{display:flex;gap:16px;background:linear-gradient(135deg,#1b1626,#161b24);border:1px solid #a48bff33;border-radius:14px;padding:20px 24px;margin:20px 0}
+.analogy .ic{font-size:30px;line-height:1}
+.analogy .tt{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--violet);font-weight:700;margin-bottom:6px}
+.analogy p{font-size:15px;color:var(--ink2)}
+.analogy p b{color:var(--ink)}
+.note{border-radius:12px;padding:14px 18px;margin:16px 0;font-size:14.5px;border:1px solid var(--line);background:var(--card2);color:var(--ink2)}
+.note b{color:var(--ink)}
+.note.beg{border-color:#5fe08a44}.note.beg b{color:var(--green)}
+.note.adv{border-color:#ff6b8b44}.note.adv b{color:var(--rose)}
+.note.pro{border-color:#ffd16644}.note.pro b{color:var(--gold)}
+table.tbl{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px}
+table.tbl th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);text-align:left;padding:10px 14px;border-bottom:1px solid #ff8a2a44;font-weight:500}
+table.tbl td{padding:11px 14px;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:top}
+table.tbl tr:hover td{background:#ffffff05}
+table.tbl td:first-child{color:var(--ink);font-weight:600}
+code.k{font-family:var(--mono);font-size:.86em;background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--orange2)}
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.7;background:#0a0d12;border:1px solid var(--line);border-radius:12px;padding:18px 22px;overflow-x:auto;margin:16px 0;color:#c7d2e0}
+pre.code .cm{color:#5b6b7f}
+pre.code .st{color:#8fd8a0}
+pre.code .fn{color:#7cc4ff}
+pre.code .kw{color:var(--orange2)}
+.codeWrap{position:relative}
+.copyBtn{position:absolute;top:10px;right:10px;z-index:2;font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;color:#c7d2e0;background:#171d27;border:1px solid var(--line);border-radius:7px;padding:5px 10px;cursor:pointer;transition:background .15s,border-color .15s}
+.copyBtn:hover{background:#212938;border-color:#3dd6c355}
+.copyBtn.copied{background:#12362d;border-color:#3dd6c3;color:#8fd8a0}
+.sim{background:linear-gradient(180deg,#101620,#0e131b);border:1px solid #3dd6c344;border-radius:20px;padding:26px 28px;margin:30px 0;position:relative}
+.sim::before{content:'\26A1 INTERACTIVE SIMULATOR';position:absolute;top:-12px;left:22px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--teal);background:var(--bg);padding:3px 12px;border:1px solid #3dd6c355;border-radius:100px;font-weight:700}
+.sim h3{font-size:20px;margin-bottom:4px}
+.sim .simSub{font-size:14px;color:var(--ink3);margin-bottom:18px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:700;font-size:13.5px;color:#161009;background:linear-gradient(180deg,var(--orange2),var(--orange));border:none;border-radius:100px;padding:10px 20px;cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px #ff8a2a44}
+.btn.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--orange);color:var(--orange);box-shadow:none}
+.btn.sm{padding:7px 15px;font-size:12.5px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.quiz{background:linear-gradient(180deg,#151021,#12161d);border:1px solid #a48bff44;border-radius:20px;padding:26px 28px;margin:34px 0;position:relative}
+.quiz::before{content:'\2726 CHECKPOINT QUIZ';position:absolute;top:-12px;left:22px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--violet);background:var(--bg);padding:3px 12px;border:1px solid #a48bff55;border-radius:100px;font-weight:700}
+.quiz .q{font-family:var(--serif);font-size:19px;font-weight:600;margin:6px 0 18px;color:var(--ink)}
+.opt{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 17px;margin:9px 0;cursor:pointer;transition:.2s;font-size:14.5px;color:var(--ink2)}
+.opt:hover{border-color:var(--violet)}
+.opt .ab{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--violet);border:1px solid #a48bff55;border-radius:8px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.opt.correct{border-color:var(--green);background:#5fe08a12;color:var(--ink)}
+.opt.correct .ab{color:var(--green);border-color:var(--green)}
+.opt.wrong{border-color:var(--red);background:#ff616112;opacity:.75}
+.opt.wrong .ab{color:var(--red);border-color:var(--red)}
+.opt.locked{pointer-events:none}
+.quizWhy{display:none;margin-top:16px;border-top:1px dashed #a48bff44;padding-top:16px;font-size:14.5px;color:var(--ink2)}
+.quizWhy.show{display:block;animation:fadeUp .4s ease}
+.quizWhy b{color:var(--violet)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.svgWrap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin:24px 0;overflow-x:auto}
+.svgWrap svg,.svgWrap img{display:block;margin:0 auto;max-width:100%;height:auto;border-radius:10px}
+.svgCap{text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin-top:14px;letter-spacing:.04em}
+.bigQuote{font-family:var(--serif);font-size:clamp(21px,3vw,28px);font-weight:500;font-style:italic;color:var(--ink);text-align:center;max-width:780px;margin:50px auto;line-height:1.5}
+.bigQuote em{color:var(--orange);font-style:italic}
+.footer{border-top:1px solid var(--line);margin-top:80px;padding:44px 0 60px;text-align:center}
+.footer p{font-size:13px;color:var(--ink3)}
+.slackDrop{background:linear-gradient(120deg,#12201e,#0f1720);border:1px solid #3dd6c355;border-radius:14px;padding:16px 20px;margin:18px 0;display:flex;gap:14px;align-items:flex-start}
+.slackDrop .av{font-size:26px}
+.slackDrop .nm{font-weight:700;color:var(--teal);font-size:14px}
+.slackDrop .tm{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-left:8px}
+.slackDrop p{font-size:14px;color:var(--ink2);margin-top:4px}
+.pickRow{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.pickBtn{font-family:var(--sans);font-weight:700;font-size:12.5px;background:#141b26;color:var(--ink2);border:1px solid var(--line);border-radius:9px;padding:9px 14px;cursor:pointer;transition:.2s;text-align:left}
+.pickBtn:hover{border-color:var(--orange)}
+.pickBtn.on{background:var(--orange-dim);border-color:var(--orange);color:var(--orange2)}
+.pickGroup{margin-bottom:14px}
+.pickGroup .pgl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:block}
+.matchWhy{margin-top:14px;font-size:14px;color:var(--ink2);min-height:24px}
+.matchWhy b{color:var(--teal)}
+.matchScore{font-family:var(--mono);font-size:12px;color:var(--gold);border:1px solid #ffd16655;background:#ffd16611;border-radius:100px;padding:6px 14px;display:inline-block;margin-top:6px}
+.runLog{background:#0a0d12;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.85;color:var(--ink2);min-height:80px;max-height:280px;overflow-y:auto;margin-top:12px}
+.runLog .lg{display:block}
+.runLog .lg.ok{color:var(--green)}.runLog .lg.err{color:var(--rose)}.runLog .lg.warn{color:var(--gold)}.runLog .lg.dim{color:var(--ink3)}
+.verdict{border-radius:12px;padding:14px 18px;margin-top:14px;font-size:14px;border:1px solid var(--line);background:var(--card2);color:var(--ink2)}
+.verdict b{color:var(--ink)}
+.verdict.good{border-color:#5fe08a55;background:#5fe08a0e}.verdict.good b{color:var(--green)}
+.verdict.bad{border-color:#ff616155;background:#ff61610e}.verdict.bad b{color:var(--rose)}
+.verdict.mid{border-color:#ffd16655;background:#ffd1660e}.verdict.mid b{color:var(--gold)}
+.twoCol{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+@media(max-width:820px){.twoCol{grid-template-columns:1fr}}
+.colCard{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.colCard .ct{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.colCard p{font-size:13.5px}
+.chalCard{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:18px 0;overflow:hidden;transition:.25s}
+.chalCard.open{border-color:#3dd6c366}
+.chalHead{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer}
+.chalHead .cn{font-family:var(--mono);font-size:12px;color:var(--teal);border:1px solid #3dd6c355;border-radius:8px;padding:4px 10px;font-weight:700}
+.chalHead h4{font-family:var(--serif);font-size:19px;flex:1}
+.chalHead .chev{font-family:var(--mono);color:var(--ink3);transition:.3s}
+.chalCard.open .chev{transform:rotate(90deg);color:var(--teal)}
+.chalBody{display:none;padding:0 22px 22px}
+.chalCard.open .chalBody{display:block;animation:fadeUp .4s ease}
+.chalBody .cLabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:16px 0 6px}
+.chalBody .mission{color:var(--ink2);font-size:14.5px}
+.switchRow{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#0a0d12;border:1px solid var(--line);border-radius:12px;padding:13px 17px;margin:9px 0}
+.switchRow .swl{font-size:13.5px;color:var(--ink2)}
+.switchRow .swl b{color:var(--ink);display:block;font-size:14.5px;margin-bottom:2px}
+.swBtn{font-family:var(--mono);font-weight:700;font-size:11.5px;letter-spacing:.06em;border:1px solid var(--line);background:#141b26;color:var(--ink3);border-radius:100px;padding:7px 16px;cursor:pointer;transition:.2s;min-width:64px;text-align:center}
+.swBtn.on{border-color:var(--green);background:#5fe08a1a;color:var(--green)}
+.transcriptCard{background:#0f141b;border:1px solid var(--line);border-radius:14px;padding:0;margin-top:16px;overflow:hidden}
+.transcriptCard .th{background:#141b26;border-bottom:1px solid var(--line);padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--ink3);display:flex;justify-content:space-between}
+.transcriptCard .tb{padding:16px 18px;font-size:13.5px;color:var(--ink2);line-height:1.7;white-space:pre-wrap;min-height:60px}
+.choiceRow{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.choiceBtn{display:flex;gap:12px;align-items:flex-start;text-align:left;background:#141b26;border:1px solid var(--line);border-radius:12px;padding:12px 16px;cursor:pointer;transition:.2s;font-family:var(--sans);font-size:13.5px;color:var(--ink2)}
+.choiceBtn:hover{border-color:var(--orange)}
+.choiceBtn.good{border-color:var(--green);background:#5fe08a12;color:var(--ink)}
+.choiceBtn.bad{border-color:var(--rose);background:#ff6b8b12;color:var(--ink)}
+.choiceBtn .cico{font-size:16px;flex-shrink:0}
+.verifyHead{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:18px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+.verifySteps{list-style:none;counter-reset:vs;margin:0;padding:0}
+.verifySteps li{counter-increment:vs;position:relative;padding:0 0 0 34px;margin:0 0 12px;font-size:13.5px;color:var(--ink2);line-height:1.6}
+.verifySteps li:last-child{margin-bottom:0}
+.verifySteps li::before{content:counter(vs);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:100px;background:#141b26;border:1px solid var(--line);color:var(--orange2);font-family:var(--mono);font-size:11px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center}
+.verifySteps li b{color:var(--ink)}
+.verifySteps li code{background:#141b26;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px;color:var(--gold);white-space:nowrap}
+.realGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+@media(max-width:820px){.realGrid{grid-template-columns:1fr}}
+.realCard{background:linear-gradient(180deg,#1a1113,#161b24);border:1px solid #ff6b8b3a;border-radius:14px;padding:20px 22px}
+.realCard .rtag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--rose);font-weight:700;margin-bottom:10px}
+.realCard h4{font-size:16.5px;margin-bottom:8px;color:var(--ink)}
+.realCard p{font-size:14px;color:var(--ink2);line-height:1.65}
+.realCard p b{color:var(--ink)}
+.meter{margin:10px 0}
+.meter .mtl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.meter .mtl .mtv{color:var(--ink);font-weight:700}
+.meter .mtBar{height:9px;border-radius:100px;background:#181f2b;border:1px solid var(--line);overflow:hidden}
+.meter .mtFill{height:100%;width:0;border-radius:100px;transition:width .45s ease}
+.meter .mtFill.g{background:var(--green)}.meter .mtFill.o{background:var(--orange)}.meter .mtFill.r{background:var(--red)}.meter .mtFill.t{background:var(--teal)}
+.stepperRow{display:flex;gap:24px;flex-wrap:wrap;margin:16px 0}
+.stepperGroup{display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--ink3)}
+.stepperGroup>div{display:flex;align-items:center;gap:10px}
+.stepperBtn{font-family:var(--mono);font-weight:700;font-size:15px;background:#141b26;color:var(--ink2);border:1px solid var(--line);border-radius:8px;width:30px;height:30px;cursor:pointer}
+.stepperBtn:hover{border-color:var(--orange);color:var(--orange)}
+.stepperVal{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--ink);min-width:20px;text-align:center}
+.churnRow{display:flex;align-items:flex-start;gap:14px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px 17px;margin:9px 0}
+.churnRow .crIco{font-size:20px;flex-shrink:0}
+.churnRow .crBody{flex:1}
+.churnRow .crName{font-weight:700;color:var(--ink);font-size:14.5px;margin-bottom:3px}
+.churnRow .crTxt{font-size:13px;color:var(--ink2);line-height:1.6}
+.churnRow .crTag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;border-radius:100px;padding:3px 10px;white-space:nowrap;flex-shrink:0;align-self:center}
+.churnRow .crTag.dead{color:var(--rose);border:1px solid #ff6b8b55;background:#ff6b8b12}
+.churnRow .crTag.renamed{color:var(--gold);border:1px solid #ffd16655;background:#ffd16612}
+.churnRow .crTag.alive{color:var(--green);border:1px solid #5fe08a55;background:#5fe08a12}
+.prepRow{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px;color:var(--ink2);gap:14px;flex-wrap:wrap}
+.prepRow:last-child{border-bottom:none}
+.prepRow b{color:var(--ink);white-space:nowrap}
+.termTable td:first-child{white-space:nowrap}
+/* ---- Class 23 additions — hands-on console builder widgets ---- */
+/* SIM1 — IAM least-privilege policy builder */
+.polGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+@media(max-width:760px){.polGrid{grid-template-columns:1fr}}
+.polRow{display:flex;align-items:flex-start;gap:12px;background:#141b26;border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;transition:.2s}
+.polRow:hover{border-color:var(--teal)}
+.polRow.on{border-color:var(--teal);background:var(--teal-dim)}
+.polRow .polBox{width:20px;height:20px;border-radius:6px;border:1px solid var(--ink3);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
+.polRow.on .polBox{border-color:var(--teal);background:var(--teal);color:#0c0f14}
+.polRow .polTxt{font-size:13px;color:var(--ink2)}
+.polRow .polTxt b{color:var(--ink);display:block;font-size:13.5px;font-family:var(--mono)}
+.polRow.needed .polTxt b::after{content:' · needed today';color:var(--green);font-family:var(--sans);font-weight:700;font-size:11px}
+.polVerdict{margin-top:16px;font-size:13.5px;color:var(--ink2);min-height:22px}
+/* SIM2 — S3 public/private toggle bucket */
+.bucketCard{background:#141b26;border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:14px 0}
+.bucketObj{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+.bucketObj:last-child{border-bottom:none}
+.bucketObj .boName{font-family:var(--mono);font-size:13px;color:var(--ink)}
+.bucketObj .boSens{font-size:11px;color:var(--rose);font-family:var(--mono);display:block}
+.s3UrlBar{background:#0a0d12;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:14px;font-family:var(--mono);font-size:12.5px;color:var(--ink3);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.s3UrlBar .s3Result{font-weight:700}
+.s3UrlBar .s3Result.ok200{color:var(--green)}
+.s3UrlBar .s3Result.deny403{color:var(--ink3)}
+.s3UrlBar .s3Result.leak{color:var(--rose)}
+/* SIM3 — EB vs EC2 path-picker with free-tier budget dial */
+.pathScenCard{background:#141b26;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:12px 0}
+.pathScenCard .pscTxt{font-size:14px;color:var(--ink);margin-bottom:12px;line-height:1.55}
+.pathBtnRow{display:flex;gap:10px;flex-wrap:wrap}
+.pathBtn{flex:1;min-width:140px;font-family:var(--sans);font-weight:700;font-size:12.5px;background:#0f141b;border:1px solid var(--line);color:var(--ink2);border-radius:9px;padding:11px 12px;cursor:pointer;transition:.2s;text-align:center}
+.pathBtn:hover{border-color:var(--orange)}
+.pathBtn:disabled{opacity:.35;cursor:not-allowed}
+.pathBtn.chosen.good{border-color:var(--green);background:#5fe08a12;color:var(--ink)}
+.pathBtn.chosen.bad{border-color:var(--rose);background:#ff6b8b12;color:var(--ink)}
+.pathScenCard .pscWhy{margin-top:10px;font-size:13px;color:var(--ink2);display:none;padding-top:10px;border-top:1px dashed var(--line)}
+.pathScenCard .pscWhy.show{display:block;animation:fadeUp .3s ease}
+/* SIM4 — billing alarm step sequencer */
+.seqBank{display:flex;flex-direction:column;gap:9px;margin:14px 0}
+.seqStep{font-family:var(--sans);font-size:13.5px;color:var(--ink2);background:#141b26;border:1px solid var(--line);border-radius:10px;padding:12px 16px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px}
+.seqStep:hover{border-color:var(--orange)}
+.seqStep.picked{opacity:.4;cursor:not-allowed;border-color:var(--green);color:var(--green)}
+.seqStep .seqNum{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--ink3);border:1px solid var(--line);border-radius:100px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.seqStep.picked .seqNum{color:var(--green);border-color:var(--green)}
+.seqOrderRow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;min-height:36px}
+.seqOrderChip{font-family:var(--mono);font-weight:700;font-size:12px;background:var(--teal-dim);border:1px solid var(--teal);color:var(--teal);border-radius:100px;padding:6px 14px}
+.seqFlash{font-size:13px;color:var(--rose);margin-top:8px;min-height:18px}
+/* SIM5 — cleanup checklist with live running-cost counter */
+.cleanRow{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#141b26;border:1px solid var(--line);border-radius:12px;padding:13px 17px;margin:9px 0}
+.cleanRow.done{border-color:var(--green);background:#5fe08a0e}
+.cleanRow .clTxt{font-size:13.5px;color:var(--ink2)}
+.cleanRow .clTxt b{color:var(--ink);display:block;font-size:14px}
+.cleanRow .clCost{font-family:var(--mono);font-size:12.5px;color:var(--rose);font-weight:700;white-space:nowrap}
+.cleanRow.done .clCost{color:var(--green);text-decoration:line-through;opacity:.6}
+.costMeterCard{background:#0a0d12;border:1px solid var(--rose);border-radius:14px;padding:16px 20px;margin-top:16px;text-align:center}
+.costMeterCard .cmLabel{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.costMeterCard .cmVal{font-family:var(--serif);font-size:38px;font-weight:700;color:var(--rose);margin:6px 0}
+.costMeterCard .cmVal.zero{color:var(--green)}
+</style>
+</head>
+<body>
+<div id="progressBar"></div>
+<nav class="topnav"><div class="wrap">
+<span class="brand">🚀 Scaler AIML · Class 23</span>
+<a class="nl" href="#open">They Want a URL, Not a Diagram</a>
+<a class="nl" href="#billing">Console, Regions &amp; the $0 Alarm</a>
+<a class="nl" href="#iam">IAM Hands-On</a>
+<a class="nl" href="#s3">S3 Hands-On</a>
+<a class="nl" href="#blurbbot">Meet Blurb Bot</a>
+<a class="nl" href="#patha">Path A · Elastic Beanstalk</a>
+<a class="nl" href="#pathb">Path B · EC2</a>
+<a class="nl" href="#decision">Which Path, When</a>
+<a class="nl" href="#cleanup">Cleanup &amp; Free-Tier Watch</a>
+<a class="nl" href="#takehome">Take-Home</a>
+<a class="nl" href="#wrap">Wrap-Up</a>
+</div></nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">
+    <span class="chip hot">CLASS 23 / SESSION SCRIPT</span>
+    <span class="chip">AWS FOR AI APPS · HANDS-ON DEPLOYMENT LAB</span>
+    <span class="chip cool">LIVE BUILD · REAL AWS ACCOUNT</span>
+    <span class="chip">IAM · S3 · ELASTIC BEANSTALK · EC2</span>
+  </div>
+  <h1>Words Were Enough Last Week. <span class="amp">Now They Want a URL.</span></h1>
+  <p class="sub"><b>Today an AWS account actually gets created, and something real gets deployed to it.</b> Class 22 gave Chapter One the vocabulary to answer a procurement office's four questions on paper. It wasn't enough. Today Nikhil answers with a live, public, working thing — the same tiny idea from Class 17's shelf-talker file, this time actually running on real infrastructure with a real address.</p>
+
+  <div class="slackDrop" style="margin-top:32px">
+    <div class="av">📩</div>
+    <div><span class="nm">Tara → Chapter One (shop group)</span><span class="tm">8:52 AM · Monday</span>
+    <p>"Their procurement guy replied to Nikhil's answers from last week — said, quote, <b>'this all sounds right, but we'd rather see a working pilot than a diagram.'</b> He wants one small thing actually live on real cloud infrastructure by Friday, not a mockup, not a slide. Nikhil — can we point at something with a real AWS URL by end of week?"</p></div>
+  </div>
+  <p style="font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--orange2);margin-top:14px">☁️🔑🚀 Today's rule: every step gets clicked live, on a real free-tier account, in this room.</p>
+
+  <div class="heroStats">
+    <div class="hstat"><div class="n" data-count="2">0</div><div class="l">Deployment Paths Built Live</div></div>
+    <div class="hstat"><div class="n" data-count="5">0</div><div class="l">Live Simulators</div></div>
+    <div class="hstat"><div class="n" data-count="1">0</div><div class="l">Real Public URL By End of Class</div></div>
+    <div class="hstat"><div class="n" data-count="0">0</div><div class="l">Root Logins Used After Setup</div></div>
+  </div>
+  <div class="agenda">
+    <h3>Today's Flight Plan · ~128 Minutes (Live Build)</h3>
+    <div class="agRow"><span class="t">00:00–00:08</span><span class="name">They Want a URL, Not a Diagram — cold open + account/card prerequisites</span><span class="tag">SETUP</span></div>
+    <div class="agRow"><span class="t">00:08–00:22</span><span class="name">Console Orientation, Regions &amp; the $0 Billing Alarm</span><span class="tag simtag">SIM + QUIZ</span></div>
+    <div class="agRow"><span class="t">00:22–00:36</span><span class="name">IAM Hands-On — creating a scoped, non-root deploy user</span><span class="tag simtag">SIM + QUIZ</span></div>
+    <div class="agRow"><span class="t">00:36–00:44</span><span class="name">☕ Stretch break</span><span class="tag">BREAK</span></div>
+    <div class="agRow"><span class="t">00:44–00:58</span><span class="name">S3 Hands-On — bucket, upload, and the public-access trap</span><span class="tag simtag">SIM + QUIZ</span></div>
+    <div class="agRow"><span class="t">00:58–01:06</span><span class="name">Meet Blurb Bot — the one app both paths deploy</span><span class="tag">BUILD</span></div>
+    <div class="agRow"><span class="t">01:06–01:26</span><span class="name">Path A — Elastic Beanstalk, step by step</span><span class="tag">BUILD</span></div>
+    <div class="agRow"><span class="t">01:26–01:46</span><span class="name">Path B — EC2 + EC2 Instance Connect, step by step</span><span class="tag">BUILD</span></div>
+    <div class="agRow"><span class="t">01:46–01:58</span><span class="name">Which Path, When — the real decision framework</span><span class="tag simtag">SIM + QUIZ</span></div>
+    <div class="agRow"><span class="t">01:58–02:10</span><span class="name">Cleanup &amp; Free-Tier Monitoring — avoiding the surprise bill</span><span class="tag simtag">SIM + QUIZ</span></div>
+    <div class="agRow"><span class="t">02:10–02:16</span><span class="name">Take-Home — 3 challenges</span><span class="tag">RESEARCH</span></div>
+    <div class="agRow"><span class="t">02:16–02:22</span><span class="name">Wrap-Up</span><span class="tag">CLOSE</span></div>
+  </div>
+</div></header>
+
+<!-- ============ SECTION: OPEN ============ -->
+<section class="blk" id="open"><div class="wrap">
+  <div class="secHead"><span class="secNum">SETUP</span><h2>They Want a URL, Not a Diagram</h2><span class="secTime">⏱ 8 min</span></div>
+  <p class="secLede">Class 22 ended deliberately unresolved: whether this deal was big enough for a real AWS migration. Tara's message above answers that question for us — the client just asked for proof, not paperwork.</p>
+
+  <div class="say">
+    <span class="who">🎙 Instructor Says — Cold Open</span>
+    <p>"Recap exactly where we left off. Last class, Nikhil learned to explain hosting, access control, regions, and architecture in plain English — and Class 22 closed on purpose without deciding whether an actual AWS migration was worth doing yet. Tara's message answers that for us: the procurement contact read the explanation and still asked for a working pilot. Not a bigger explanation. A URL."</p>
+    <p>"That's today's whole shape. We're not migrating Restock Radar or rebuilding the whole shop's stack — that's still a bigger decision for another day. We're doing the smallest honest version of 'something real, live, on AWS' that we can finish in one class: <b>Blurb Bot</b>, one form field, one AI call, one live page. Small enough to build twice — once the beginner way, once the more hands-on way — so everyone sees both."</p>
+  </div>
+
+  <div class="card">
+    <h3>Chapter One — the cast, unchanged</h3>
+    <div class="grid4">
+      <div class="useCase"><div class="ico">🛠</div><div class="co">Builds it</div><h4>Nikhil</h4><p>Creates a real AWS account today, on purpose — not his root login for everything, a properly scoped setup from the very first user he creates.</p></div>
+      <div class="useCase"><div class="ico">📖</div><div class="co">Owner</div><h4>Sarita</h4><p>Wants Friday's URL to exist without wondering what it's quietly costing by Saturday — today's cleanup section exists mostly for her peace of mind.</p></div>
+      <div class="useCase"><div class="ico">☕</div><div class="co">Relays the ask</div><h4>Tara</h4><p>The one who has to tell the client "yes, it's live" by Friday — and the one who'll ask, at the very end of class, who else needs to be able to touch it.</p></div>
+      <div class="useCase"><div class="ico">👓</div><div class="co">Actual developer</div><h4>Ravi</h4><p>Watches today's IAM section closely — his Class 21 access-control question finally gets a hands-on answer, not just a concept.</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Before You Touch a Single Console Button — Confirm the Account Is Actually Ready</h3>
+    <p>Nothing below works without a real AWS account signed in and ready. This has never come up in this course before — Class 22 was screenshots only — so run every check below, live, before Step 1 of §1.</p>
+    <div class="prepRow"><b>Check 1 · AWS account exists?</b><span>If nobody in the room has one, sign up free at <code class="k">aws.amazon.com</code> — email, a chosen password, account name. Budget 5–10 minutes; it is not instant.</span></div>
+    <div class="prepRow"><b>Check 2 · Payment method on file?</b><span>AWS requires a valid debit or credit card during signup even for every free-tier service used today — this is non-negotiable and normal, not a sign anything will be charged if today's steps are followed.</span></div>
+    <div class="prepRow"><b>Check 3 · Identity verification</b><span>New signups require a one-time phone verification (an automated call or SMS code) as part of account creation — keep a phone in hand during signup.</span></div>
+    <div class="prepRow"><b>Check 4 · Support plan prompt</b><span>Signup ends by asking you to pick a support plan — choose <b>Basic support - Free</b>. Anything else on this screen is a paid add-on nobody in this class needs today.</span></div>
+    <div class="prepRow"><b>Check 5 · Signed in as the account root user</b><span>Right after signup you're automatically the <b>root user</b> — the one identity with zero restrictions. §2 today exists specifically so nobody keeps using this login past the setup steps.</span></div>
+  </div>
+
+  <div class="note beg"><b>Say this out loud before starting:</b> a card on file is not the same thing as a charge. Every single service used today — IAM, S3 at this file size, one small EB environment, one t3.micro EC2 instance for under two hours — sits inside AWS's free allowances when torn down the same day, per §8's cleanup steps. The card exists because AWS requires one for identity and fraud-prevention purposes on every account, free tier or not.</div>
+  <div class="note adv"><b>Instructor — before you teach this live:</b> AWS changed its free-tier structure on <b>July 15, 2025</b>. Accounts created <i>before</i> that date still get the classic 12-month free tier (roughly 750 EC2 t2.micro/t3.micro hours a month, among other allowances). Accounts created <i>after</i> that date instead get a 6-month, credit-based "Free Plan" (around $100 signup credit, plus up to $100 more for using certain services) that expires on whichever comes first — 6 months, or the credits running out. If anyone in the room is signing up fresh today, say this out loud: their free tier is genuinely not the same deal as an older account's, and re-verify the exact current numbers at <a href="https://aws.amazon.com/free" target="_blank" rel="noopener">aws.amazon.com/free</a> the night before you teach this, the same way Class 21 re-verified Railway's pricing before it changed too.</div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ SECTION 1: CONSOLE, REGIONS & BILLING ALARM ============ -->
+<section class="blk" id="billing"><div class="wrap">
+  <div class="secHead"><span class="secNum">§ 1</span><h2>Console Orientation, Regions &amp; the $0 Billing Alarm</h2><span class="secTime">⏱ 14 min</span></div>
+  <p class="secLede">Before creating a single resource, set a tripwire that emails you the moment real spend appears. Every class from here builds on top of this being done first, always.</p>
+
+  <div class="say do">
+    <span class="who">🛠 Instructor Does — live, on screen, 3 min</span>
+    <p>Walk the room through the console's three fixed landmarks: the <b>region selector</b> (top right — most services are region-scoped, meaning a resource created in Mumbai is invisible from N. Virginia's view), the <b>search bar</b> (the fastest way to reach any service by name instead of hunting menus), and the <b>account name menu</b> (top right, next to region — this is where Billing lives). Say clearly: today's resources go in one consistent region, chosen once, in §2.</p>
+  </div>
+
+  <div class="defBox">
+    <span class="term">Why a billing alarm has to exist before anything else</span>
+    <p>Nothing about the free tier stops a misconfigured resource from silently billing real money once a cap is crossed — there's no gentle warning banner the way Render's dashboard shows one. A billing alarm is the only thing standing between "oops" and "found out three weeks later." AWS actually offers two different tools for this, and it's worth knowing both exist.</p>
+  </div>
+
+  <table class="tbl">
+    <tr><th>Tool</th><th>What it actually does</th><th>The gotcha</th></tr>
+    <tr><td>AWS Budgets</td><td>Lets you set a literal near-zero dollar threshold (e.g. "alert me the moment actual spend crosses $1") and emails you when it's crossed. The more direct match for "a $0 alert."</td><td>Found under Billing and Cost Management — no region-switching needed, it's account-wide.</td></tr>
+    <tr><td>CloudWatch billing alarm</td><td>The older, more commonly tutorialized route — a CloudWatch alarm watching the account's <code class="k">EstimatedCharges</code> metric.</td><td>The metric is only ever published in <b>us-east-1 (N. Virginia)</b> — an alarm created in any other region will sit there silently and never fire, no matter what actually gets spent.</td></tr>
+  </table>
+
+  <div class="verifyHead">✅ Do This Live — Set Up a Near-Zero Spend Alert (AWS Budgets route)</div>
+  <div class="card">
+    <ol class="verifySteps">
+      <li>Open the account menu (top right) → <b>Billing and Cost Management</b>.</li>
+      <li>In the left sidebar, first open <b>Billing preferences</b> and check <b>"Receive Billing Alerts"</b> (some accounts also show a Free Tier usage alert checkbox — check that too) → <b>Save preferences</b>. Billing alarms of either kind silently do nothing until this box is checked.</li>
+      <li>Go to <b>Budgets</b> → <b>Create a budget</b> → choose a <b>Zero spend budget</b> template if offered, or a <b>Cost budget</b> with a <b>$1</b> monthly threshold otherwise.</li>
+      <li>Set an alert threshold at <b>100% of actual spend</b> and enter your own email as the recipient.</li>
+      <li>Create the budget, then open the confirmation email AWS sends and confirm the subscription — nothing arrives later without this click.</li>
+    </ol>
+  </div>
+
+  <div class="note adv"><b>The classic gotcha, taught on purpose:</b> if you (or a student) instead follow an older tutorial's CloudWatch-alarm route, the alarm has to be created with the region selector set to <b>US East (N. Virginia) / us-east-1</b> — even if every resource today lives in Mumbai or anywhere else. This is a genuinely common trip-up; verify it's still accurate the night before teaching, since AWS documentation has shifted emphasis toward Budgets over the years.</div>
+
+  <!-- SIM 4 (billing sequencer) placed here to match section order -->
+  <div class="sim" id="sim1">
+    <h3>SIM 1 · Build the Alarm in the Right Order</h3>
+    <p class="simSub">Five real steps to a working $0-ish spend alert, shuffled. Click them in the order they actually have to happen — click one out of order and it bounces back so you can try again.</p>
+
+    <div class="seqBank" id="s1bank"></div>
+    <div class="seqOrderRow" id="s1order"></div>
+    <div class="seqFlash" id="s1flash"></div>
+    <button class="btn sm ghost" id="s1reset">↺ Reset</button>
+  </div>
+
+  <div class="quiz" id="quiz1">
+    <div class="q">Q1. Nikhil sets up a CloudWatch billing alarm while the region selector is set to Mumbai (ap-south-1), where Blurb Bot actually runs. A week later, real spend has happened but the alarm never fires. Why?</div>
+    <div class="opt" data-c="1"><span class="ab">A</span><span>CloudWatch billing alarms only check once every 30 days, so a week isn't long enough yet.</span></div>
+    <div class="opt" data-c="2"><span class="ab">B</span><span>The account needs MFA turned on before any billing alarm can trigger, regardless of region.</span></div>
+    <div class="opt" data-c="0"><span class="ab">C</span><span>The billing metric only exists in us-east-1 — an alarm anywhere else never sees real data, no matter where the actual resources are running.</span></div>
+    <div class="opt" data-c="3"><span class="ab">D</span><span>A minimum of $10 in spend has to accumulate before any billing alarm is allowed to trigger for the first time.</span></div>
+    <div class="quizWhy">Correct answer: <b>C</b>. AWS billing data is aggregated account-wide and only ever published as a metric in us-east-1 — the alarm has to live there specifically, independent of which region the actual resources sit in.</div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ SECTION 2: IAM HANDS-ON ============ -->
+<section class="blk" id="iam"><div class="wrap">
+  <div class="secHead"><span class="secNum">§ 2</span><h2>IAM Hands-On — Creating a Scoped, Non-Root User</h2><span class="secTime">⏱ 14 min</span></div>
+  <p class="secLede">Class 22 explained least privilege. Today Nikhil actually clicks through creating the user who'll do every remaining step today — never root again after this section.</p>
+
+  <div class="note adv"><b>Say this before Step 1:</b> the root user (the identity created at signup) can do literally anything, including deleting the whole account. AWS's own guidance is to stop using it for daily work immediately after setup. Everything from here — S3, Elastic Beanstalk, EC2 — should be done signed in as the IAM user created below, not root.</div>
+
+  <div class="verifyHead">✅ Do This Live — Create the Deploy User</div>
+  <div class="card">
+    <ol class="verifySteps">
+      <li>Console search bar → <b>IAM</b> → <b>Users</b> (left sidebar) → <b>Create user</b>.</li>
+      <li>Name it something identifiable, e.g. <code class="k">nikhil-deploy</code>. Check <b>"Provide user access to the AWS Management Console"</b> so it can be verified by logging in as this user today — choose <b>"I want to create an IAM user"</b> and set a custom password (uncheck "require password reset" for classroom speed).</li>
+      <li>On the permissions screen, choose <b>"Attach policies directly"</b>. For today's work, search for and attach: <code class="k">AmazonS3FullAccess</code>, <code class="k">AWSElasticBeanstalkFullAccess</code>, and <code class="k">AmazonEC2FullAccess</code>.</li>
+      <li>Review and <b>Create user</b>. Note the IAM sign-in link shown on the confirmation screen (format: <code class="k">https://[account-id-or-alias].signin.aws.amazon.com/console</code>) — this, not the root email, is how you'll sign back in for every remaining step today.</li>
+      <li>Sign out of root. Sign back in via that IAM sign-in link with the new username and password, and confirm the console loads — this is the checkpoint that actually proves the user works.</li>
+    </ol>
+  </div>
+
+  <div class="note pro"><b>Say this out loud, honestly:</b> the three managed policies above are broad — <code class="k">AmazonS3FullAccess</code> grants access to every bucket in the account, not just today's demo bucket. That's a deliberate classroom trade-off for speed, not real least privilege. A production setup would instead write a custom JSON policy scoped to exact actions on exact resource ARNs — SIM 2 below is exactly that exercise, without touching the real console.</div>
+
+  <!-- SIM 1 (IAM builder) -->
+  <div class="sim" id="sim2">
+    <h3>SIM 2 · Build the Real Least-Privilege Policy</h3>
+    <p class="simSub">Ignore what got attached above for speed — this is the policy Nikhil should actually ship for a production "deploy-helper" user. Check only the permissions today's actual work needs; each extra checkbox drags the score down, and each missing one that's genuinely needed blocks real work.</p>
+
+    <div class="polGrid" id="s2grid"></div>
+    <div class="meter">
+      <div class="mtl"><span>Least-privilege score</span><span class="mtv" id="s2scoreLabel">0 / 100</span></div>
+      <div class="mtBar"><div class="mtFill t" id="s2bar" style="width:0%"></div></div>
+    </div>
+    <div class="polVerdict" id="s2verdict"></div>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <div class="q">Q2. Nikhil attaches <code class="k">AmazonS3FullAccess</code>, <code class="k">AWSElasticBeanstalkFullAccess</code>, and <code class="k">AmazonEC2FullAccess</code> to <code class="k">nikhil-deploy</code> so today's work definitely won't hit a permissions wall. What's the honest read on that choice?</div>
+    <div class="opt" data-c="0"><span class="ab">A</span><span>It gets today's work done, but it isn't real least privilege — those are broad managed policies covering every bucket and environment in the account, not just this class's demo resources.</span></div>
+    <div class="opt" data-c="1"><span class="ab">B</span><span>It already is least privilege, since none of the three policies is literally <code class="k">AdministratorAccess</code>.</span></div>
+    <div class="opt" data-c="2"><span class="ab">C</span><span>It's actually under-privileged — a billing-view policy needs to be added too, or the alarm from §1 stops working.</span></div>
+    <div class="opt" data-c="3"><span class="ab">D</span><span>None of it matters as long as MFA is switched on for the user afterward.</span></div>
+    <div class="quizWhy">Correct answer: <b>A</b>. "Not admin" isn't the same as "scoped." All three attached policies are account-wide full-access grants — convenient for a live class, but a genuinely production-minded setup would narrow each one down to the specific bucket and environment this project actually touches.</div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ SECTION 3: S3 HANDS-ON ============ -->
+<section class="blk" id="s3"><div class="wrap">
+  <div class="secHead"><span class="secNum">§ 3</span><h2>S3 Hands-On — Bucket, Upload &amp; the Public-Access Trap</h2><span class="secTime">⏱ 14 min</span></div>
+  <p class="secLede">Object storage as a building block, hands-on — and the one real behavior change that catches almost everyone who last touched S3 more than a couple of years ago.</p>
+
+  <div class="verifyHead">✅ Do This Live — Create a Bucket and Upload a File</div>
+  <div class="card">
+    <ol class="verifySteps">
+      <li>Signed in as <code class="k">nikhil-deploy</code>, console search → <b>S3</b> → <b>Create bucket</b>.</li>
+      <li>Bucket names are globally unique across all of AWS — pick something specific, e.g. <code class="k">blurbbot-demo-yourname-2026</code>. Choose the same region today's other resources will use (§5–§6 pick one region and stick with it).</li>
+      <li>Leave every <b>Block Public Access</b> setting checked on — this is the correct default, and stays that way for the bucket as a whole.</li>
+      <li><b>Create bucket</b>, open it, <b>Upload → Add files</b>, pick any small test file, and upload.</li>
+      <li>Click the uploaded object's name → copy its <b>Object URL</b> → open it in a new browser tab. Expect <b>Access Denied</b> — that's Block Public Access doing exactly its job.</li>
+    </ol>
+  </div>
+
+  <div class="note adv"><b>Not the old 2018 behavior — say this explicitly:</b> S3 now blocks all public access by default on every new bucket, account-wide. Older tutorials that show one checkbox toggle to "make public" are describing pre-2023 defaults. Getting one object public today genuinely requires two separate steps, on purpose — AWS added the friction after a long string of real-world leaked-bucket incidents.</div>
+
+  <div class="verifyHead">✅ Do This Live — Make Exactly One Object Public (Not the Whole Bucket)</div>
+  <div class="card">
+    <ol class="verifySteps">
+      <li>Bucket → <b>Permissions</b> tab → <b>Block public access (bucket settings)</b> → <b>Edit</b> → uncheck only <b>"Block public access to buckets and objects granted through new public bucket or access point policies"</b> → save, type <code class="k">confirm</code>.</li>
+      <li>Back in <b>Permissions</b>, scroll to <b>Bucket policy</b> → <b>Edit</b>, and paste a policy granting <code class="k">s3:GetObject</code> to <code class="k">*</code> scoped to only that one object's ARN — not <code class="k">arn:aws:s3:::bucket-name/*</code>, which would expose everything in the bucket.</li>
+      <li>Save, return to the object, copy its Object URL again, and reopen it — it should now resolve instead of Access Denied.</li>
+    </ol>
+  </div>
+
+  <div class="note adv"><b>Security callout — say this with real weight, not as a footnote:</b> a bucket policy scoped to <code class="k">/*</code> instead of one specific object key is the single most common way real S3 leaks happen — member lists, invoice PDFs, backup dumps, all reachable by anyone with the URL. Scope every public grant to the exact object it needs to cover, never the whole bucket, especially once real customer data like the chain's member records is involved.</div>
+
+  <!-- SIM 2 (S3 toggle) -->
+  <div class="sim" id="sim3">
+    <h3>SIM 3 · The Bucket, Toggled</h3>
+    <p class="simSub">Three objects sit in one demo bucket, including one that shouldn't ever be public. Flip Block Public Access and each object's own public grant, then try loading its URL and see what actually comes back.</p>
+
+    <div class="bucketCard">
+      <div class="switchRow">
+        <div class="swl"><b>Block Public Access (bucket-wide)</b><span>The default, and the correct state to leave it in unless a specific object needs an exception.</span></div>
+        <button class="swBtn on" id="s3bpaBtn">ON</button>
+      </div>
+      <div id="s3objs"></div>
+    </div>
+    <div class="s3UrlBar"><span id="s3UrlTxt">Click "Test URL" on an object above</span><span class="s3Result" id="s3UrlResult"></span></div>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <div class="q">Q3. Right after uploading a file to a brand-new S3 bucket, Nikhil pastes its Object URL into a browser and gets Access Denied. What's actually going on?</div>
+    <div class="opt" data-c="1"><span class="ab">A</span><span>New S3 buckets take up to 24 hours before they can serve any file by URL.</span></div>
+    <div class="opt" data-c="2"><span class="ab">B</span><span>Only image file types are ever servable by a direct S3 URL.</span></div>
+    <div class="opt" data-c="3"><span class="ab">C</span><span>He needs to re-upload the same file a second time — public access flips on automatically after that.</span></div>
+    <div class="opt" data-c="0"><span class="ab">D</span><span>S3 now blocks all public access by default on every new bucket — nothing is reachable by URL until Block Public Access is explicitly turned off and a policy explicitly grants public read.</span></div>
+    <div class="quizWhy">Correct answer: <b>D</b>. This is the exact behavior §3 just walked through live — Access Denied is the expected, correct default, not a bug, until both the account-level block is lifted and an explicit grant is added.</div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ SECTION: MEET BLURB BOT ============ -->
+<section class="blk" id="blurbbot"><div class="wrap">
+  <div class="secHead"><span class="secNum">BUILD</span><h2>Meet Blurb Bot — The One App Both Paths Deploy</h2><span class="secTime">⏱ 8 min</span></div>
+  <p class="secLede">One form field, one AI call, one page. Small enough to write live, small enough to deploy twice, and it closes a loop that's been open since Class 17.</p>
+
+  <div class="say">
+    <span class="who">🎙 Instructor Says</span>
+    <p>"Remember <code class="k">shelf-talker.html</code> from Class 17 — the one that only ever worked by double-clicking it on Nikhil's own laptop? Blurb Bot is its real successor: type a book title, get back a one-line shelf-talker blurb generated live by an actual LLM call, on a page anyone can reach — not just whoever's standing at Nikhil's desk. Same idea from Class 17, finally running on real infrastructure with a real address."</p>
+  </div>
+
+  <div class="note pro"><b>Which LLM, and why:</b> Blurb Bot calls <a href="https://groq.com" target="_blank" rel="noopener">Groq's API</a> — the same reliable free choice this series settled on back in Class 16, after Gemini's free tier proved too rate-limit-prone for a live class. Groq's API is OpenAI-compatible (same request shape, different base URL) and its free tier needs no card on file for the API itself — a real, currently-available free tier with per-model request-per-minute and token-per-minute caps, not a time-limited trial. Model used below: <code class="k">llama-3.1-8b-instant</code> — fast, currently listed as a production model, and more than enough for a one-line blurb.</div>
+
+  <div class="card">
+    <h3><code class="k">app.py</code> — the whole backend</h3>
+    <div class="codeWrap"><button class="copyBtn">Copy</button><pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, render_template, request
+<span class="kw">import</span> os
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+app = Flask(__name__)
+client = OpenAI(
+    api_key=os.environ.get(<span class="st">"GROQ_API_KEY"</span>),
+    base_url=<span class="st">"https://api.groq.com/openai/v1"</span>
+)
+
+<span class="fn">@app.route</span>(<span class="st">"/"</span>, methods=[<span class="st">"GET"</span>, <span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">index</span>():
+    blurb = <span class="kw">None</span>
+    title = <span class="st">""</span>
+    <span class="kw">if</span> request.method == <span class="st">"POST"</span>:
+        title = request.form.get(<span class="st">"title"</span>, <span class="st">""</span>).strip()
+        <span class="kw">if</span> title:
+            resp = client.chat.completions.create(
+                model=<span class="st">"llama-3.1-8b-instant"</span>,
+                messages=[
+                    {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Write one punchy one-line bookshop shelf-talker blurb for the given title. Under 20 words. No surrounding quotes."</span>},
+                    {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: title}
+                ],
+                max_tokens=60
+            )
+            blurb = resp.choices[0].message.content.strip()
+    <span class="kw">return</span> render_template(<span class="st">"index.html"</span>, blurb=blurb, title=title)
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    app.run(host=<span class="st">"0.0.0.0"</span>, port=8000)</pre></div>
+  </div>
+
+  <div class="twoCol">
+    <div class="colCard"><div class="ct" style="color:var(--teal)">requirements.txt</div><p><code class="k">flask</code><br><code class="k">openai</code><br><code class="k">gunicorn</code></p></div>
+    <div class="colCard"><div class="ct" style="color:var(--gold)">templates/index.html</div><p>One plain HTML form (a text input named <code class="k">title</code>, a submit button) plus a paragraph that prints <code class="k">{{ blurb }}</code> when it exists. No database, no styling framework, no Docker — the whole point is keeping this deployable inside a two-hour class.</p></div>
+  </div>
+
+  <div class="note adv"><b>Never hardcode the key:</b> <code class="k">GROQ_API_KEY</code> is read from an environment variable, exactly like Class 21 taught for Render and Railway — never pasted directly into <code class="k">app.py</code> or committed to the repo. §5 and §6 below each show the AWS-specific way to set it.</div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ SECTION 4: PATH A — ELASTIC BEANSTALK ============ -->
+<section class="blk" id="patha"><div class="wrap">
+  <div class="secHead"><span class="secNum">§ 4</span><h2>Path A — Elastic Beanstalk (Beginner Path)</h2><span class="secTime">⏱ 20 min</span></div>
+  <p class="secLede">Hand AWS the code; it provisions and manages the EC2 machine, load balancer, and health checks underneath. Fewer decisions, one command to go live.</p>
+
+  <div class="card">
+    <h3>Before Step 1 — Confirm the EB CLI Is Installed</h3>
+    <div class="prepRow"><b>Check · Python installed?</b><span>Run <code class="k">python3 --version</code> (Mac) or <code class="k">python --version</code> (Windows). The EB CLI installs via <code class="k">pip</code>, so Python has to already be there — install from <code class="k">python.org</code> first if it's missing.</span></div>
+    <div class="prepRow"><b>Install, on Mac</b><span>Run <code class="k">python3 -m pip install --upgrade --user awsebcli</code> in Terminal. If <code class="k">eb</code> isn't recognized afterward, the pip user-install path isn't on <code class="k">PATH</code> yet — the terminal output tells you exactly which folder to add.</span></div>
+    <div class="prepRow"><b>Install, on Windows</b><span>Open a fresh Command Prompt or PowerShell and run <code class="k">pip install awsebcli --upgrade --user</code>. If <code class="k">eb --version</code> fails afterward, add the Python <code class="k">Scripts</code> folder shown in the install output to your system <code class="k">PATH</code> and reopen the terminal.</span></div>
+    <div class="prepRow"><b>Confirm either OS</b><span>Run <code class="k">eb --version</code> — a version string back means it's ready.</span></div>
+  </div>
+
+  <div class="verifyHead">✅ Do This Live — Deploy Blurb Bot via Elastic Beanstalk</div>
+  <div class="card">
+    <ol class="verifySteps">
+      <li>In the Blurb Bot project folder (containing <code class="k">app.py</code>, <code class="k">requirements.txt</code>, <code class="k">templates/</code>), run <code class="k">eb init</code>. Choose your region, an application name (e.g. <code class="k">blurb-bot</code>), and the Python platform matching your local version.</li>
+      <li>When prompted for credentials, use the <b>access key of <code class="k">nikhil-deploy</code></b> from §2 — generate one under that IAM user's <b>Security credentials</b> tab if it doesn't already have one. Never the root account's keys.</li>
+      <li>Run <code class="k">eb create blurb-bot-env</code>. This provisions an EC2 instance, a load balancer, and health monitoring underneath — expect several minutes, not instant.</li>
+      <li><b>Checkpoint:</b> once it finishes, run <code class="k">eb status</code> — it should read <b>Health: Green</b> before continuing.</li>
+      <li>Set the Groq key without ever touching a file: <code class="k">eb setenv GROQ_API_KEY=your_actual_key_here</code>.</li>
+      <li>Run <code class="k">eb open</code> — it opens the live EB URL in a browser. Type a book title into Blurb Bot and confirm a real blurb comes back.</li>
+    </ol>
+  </div>
+
+  <div class="note adv"><b>Flag this honestly:</b> modern Elastic Beanstalk Python platforms (Amazon Linux 2023) generally expect a <code class="k">Procfile</code> in the project root (one line: <code class="k">web: gunicorn app:app</code>) to know how to start the app — older platform generations auto-detected an <code class="k">application.py</code> file instead. Confirm which platform generation is current and which file EB expects the night before you teach this; EB's exact auto-detection behavior is one of the more actively-changing corners of AWS's docs.</div>
+
+  <div class="note beg"><b>Checkpoint recap:</b> three green checkpoints, in order — <code class="k">eb create</code> finishes without error, <code class="k">eb status</code> reads Health: Green, and <code class="k">eb open</code> loads a page that actually returns a blurb. Any red between those is worth pausing on before moving to Path B.</div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ SECTION 5: PATH B — EC2 ============ -->
+<section class="blk" id="pathb"><div class="wrap">
+  <div class="secHead"><span class="secNum">§ 5</span><h2>Path B — EC2 + EC2 Instance Connect (Intermediate Path)</h2><span class="secTime">⏱ 20 min</span></div>
+  <p class="secLede">The same app, the manual way — full control over the machine, and a browser-based connection with no local SSH key setup at all.</p>
+
+  <div class="note adv"><b>Instance-type honesty check, before Step 1:</b> the classic "750 free EC2 hours a month, 12 months" claim applies only to accounts created before July 15, 2025 (see §Setup). Confirm live which free-tier terms today's demo account is actually on, and pick a genuinely free-tier-eligible size for it — <code class="k">t2.micro</code> or <code class="k">t3.micro</code> on the classic tier, or a small size covered by remaining credit on a newer account. Re-verify the current list at <code class="k">aws.amazon.com/free</code> before class.</div>
+
+  <div class="verifyHead">✅ Do This Live — Launch, Connect, and Run Blurb Bot on EC2</div>
+  <div class="card">
+    <ol class="verifySteps">
+      <li>Console search → <b>EC2</b> → <b>Launch instance</b>. Name it (e.g. <code class="k">blurb-bot-ec2</code>), choose the <b>Amazon Linux</b> AMI, and instance type <code class="k">t3.micro</code> (or <code class="k">t2.micro</code> — whichever your account's free tier actually covers).</li>
+      <li><b>Key pair:</b> select <b>"Proceed without a key pair"</b> — EC2 Instance Connect below needs no local SSH key at all.</li>
+      <li><b>Network settings → Edit</b>: allow <b>SSH (port 22)</b> from <b>My IP</b>, and add a second custom TCP rule opening <b>port 8000</b> (Blurb Bot's port) from <b>Anywhere (0.0.0.0/0)</b> — that second rule is what makes the live URL publicly reachable.</li>
+      <li><b>Launch instance</b>, wait for its status to read <b>Running</b> and <b>2/2 checks passed</b>.</li>
+      <li>Select the instance → <b>Connect</b> → the <b>EC2 Instance Connect</b> tab → <b>Connect</b>. A browser-based terminal opens directly — no local <code class="k">.pem</code> file, no <code class="k">ssh</code> command typed anywhere.</li>
+      <li>In that browser terminal: <code class="k">sudo yum install -y python3-pip git</code>, then <code class="k">git clone</code> the Blurb Bot repo, <code class="k">cd</code> into it, <code class="k">pip3 install -r requirements.txt --user</code>.</li>
+      <li>Set the key for this session and run it: <code class="k">export GROQ_API_KEY=your_actual_key_here</code> then <code class="k">python3 app.py</code>. Keep this terminal open — closing it stops the app.</li>
+      <li><b>Checkpoint:</b> copy the instance's <b>Public IPv4 address</b> from the EC2 console, open <code class="k">http://that-address:8000</code> in a browser, and confirm Blurb Bot actually returns a blurb end to end.</li>
+    </ol>
+  </div>
+
+  <div class="note pro"><b>Kept deliberately minimal, on purpose:</b> Flask's own built-in server (<code class="k">app.run(...)</code>) is doing the serving here, not gunicorn behind nginx — that stack is real-world best practice, but it's more moving parts than a live two-hour class needs to get one working public URL. Say this out loud as a scope call, not an oversight.</div>
+  <div class="note adv"><b>Opening 0.0.0.0/0 on a custom port is a classroom trade-off, said honestly:</b> it's the fastest way to get a demo-reliable public URL live in one session. A real deployment would restrict that rule far more tightly (a specific IP range, or better, behind a load balancer) — flag this out loud as a shortcut being taken for demo reliability, not a recommended production pattern.</div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ SECTION 6: DECISION ============ -->
+<section class="blk" id="decision"><div class="wrap">
+  <div class="secHead"><span class="secNum">§ 6</span><h2>Which Path, When — The Real Decision Framework</h2><span class="secTime">⏱ 12 min</span></div>
+  <p class="secLede">Both paths just deployed the exact same app. The choice between them was never about capability — it's about how much of the machine underneath you actually want to manage yourself.</p>
+
+  <table class="tbl">
+    <tr><th>Question</th><th>Points toward Elastic Beanstalk</th><th>Points toward EC2</th></tr>
+    <tr><td>Who's doing this deploy?</td><td>Someone deploying solo, wants a URL back fast.</td><td>Someone who wants to see and control every layer themselves.</td></tr>
+    <tr><td>Does the app need custom OS-level setup?</td><td>No — a standard Python platform covers it.</td><td>Yes — a specific package, service, or config EB's platform doesn't offer directly.</td></tr>
+    <tr><td>Who patches and scales the underlying server?</td><td>AWS, automatically, as part of the platform.</td><td>You — full control, full responsibility.</td></tr>
+    <tr><td>Time budget to a working URL?</td><td>Minutes — a handful of <code class="k">eb</code> commands.</td><td>Longer — every install step is manual, on purpose.</td></tr>
+  </table>
+
+  <!-- SIM 3 (path picker + free-tier budget dial) -->
+  <div class="sim" id="sim4">
+    <h3>SIM 4 · Pick the Path, Watch the Free-Tier Dial</h3>
+    <p class="simSub">Five real deployment asks. Pick Elastic Beanstalk or EC2 for each — your choice also nudges a free-tier "hours consumed today" dial, since EB provisions more underneath it than a single EC2 instance does.</p>
+
+    <div id="s4scenarios"></div>
+    <div class="meter" style="margin-top:18px">
+      <div class="mtl"><span>Simulated free-tier hours used today</span><span class="mtv" id="s4hoursLabel">0.0 hrs</span></div>
+      <div class="mtBar"><div class="mtFill o" id="s4hoursBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <div class="q">Q4. The chain wants Blurb Bot live today with the fewest moving parts Nikhil has to hand-manage, and nobody needs to tweak the underlying server. Which path fits, and why?</div>
+    <div class="opt" data-c="0"><span class="ab">A</span><span>Elastic Beanstalk — it provisions and manages the EC2 instance, load balancer, and health checks underneath, so Nikhil hands over code and gets a URL back.</span></div>
+    <div class="opt" data-c="1"><span class="ab">B</span><span>EC2 — full manual control over the exact machine is always the safer first choice for any new deployment.</span></div>
+    <div class="opt" data-c="2"><span class="ab">C</span><span>Neither fits — Lambda is the only AWS service actually capable of running a Flask app.</span></div>
+    <div class="opt" data-c="3"><span class="ab">D</span><span>EC2 with EC2 Instance Connect, since Instance Connect itself is what manages scaling and health checks.</span></div>
+    <div class="quizWhy">Correct answer: <b>A</b>. This scenario names exactly the trade Elastic Beanstalk is built for — less to hand-manage, in exchange for less direct control over the machine underneath. EC2 Instance Connect (option D) is just a browser-based connection method, not a scaling or health system at all.</div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ SECTION 7: CLEANUP ============ -->
+<section class="blk" id="cleanup"><div class="wrap">
+  <div class="secHead"><span class="secNum">§ 7</span><h2>Cleanup &amp; Free-Tier Monitoring — Avoiding the Surprise Bill</h2><span class="secTime">⏱ 12 min</span></div>
+  <p class="secLede">This is the section that keeps today free, literally. Treat it with the same weight as the deploy itself — an unattended resource is how a free class becomes a real bill.</p>
+
+  <div class="verifyHead">✅ Do This Live — Tear Down Everything Built Today</div>
+  <div class="card">
+    <ol class="verifySteps">
+      <li><b>EC2:</b> Instances → select <code class="k">blurb-bot-ec2</code> → <b>Instance state → Terminate instance</b>. Terminate, not just Stop — a stopped instance can still hold billable storage attached to it.</li>
+      <li><b>Elastic Beanstalk:</b> run <code class="k">eb terminate blurb-bot-env</code>, or console → environment → <b>Environment actions → Terminate environment</b>.</li>
+      <li><b>Don't stop there:</b> Elastic Beanstalk auto-creates its own S3 bucket to hold uploaded application versions and logs — terminating the environment does not delete that bucket. Check <b>S3</b> for a bucket named like <code class="k">elasticbeanstalk-[region]-[account-id]</code> and remove it manually if it's not needed.</li>
+      <li>Delete the demo bucket created in §3 as well — empty it first if it holds more than one object.</li>
+      <li>Recheck the <b>Billing dashboard</b> (or the Budget created in §1) the next day, not immediately — billing data has a reporting delay, so "$0 right now" isn't proof yet.</li>
+    </ol>
+  </div>
+
+  <div class="note adv"><b>Say this with real weight:</b> "terminated the environment" and "done" are not the same sentence. The single most common real AWS surprise-bill story is exactly this shape — an environment or instance gets torn down, but a bucket, an Elastic IP, or a log group it created along the way keeps quietly running. Five extra minutes checking S3 and EC2 directly is the actual difference between a free class and a bill nobody expected.</div>
+
+  <!-- SIM 5 (cleanup checklist + cost counter) -->
+  <div class="sim" id="sim5">
+    <h3>SIM 5 · Tear It All Down</h3>
+    <p class="simSub">Five resources from today, each with what it would quietly cost per month if left running. Check each one off as you clean it up and watch the running total drop — leave anything unchecked and see what it adds up to.</p>
+
+    <div id="s5rows"></div>
+    <div class="costMeterCard">
+      <div class="cmLabel">Estimated $/month if left exactly as-is right now</div>
+      <div class="cmVal" id="s5total">$0.00</div>
+    </div>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <div class="q">Q5. Nikhil terminates the EB environment the day after class and assumes he's fully done. A small charge still shows up on next month's bill. What did he most likely miss?</div>
+    <div class="opt" data-c="0"><span class="ab">A</span><span>Elastic Beanstalk's auto-created S3 bucket (holding app versions and logs) isn't deleted just because the environment is terminated — it has to be checked and removed separately.</span></div>
+    <div class="opt" data-c="1"><span class="ab">B</span><span>Terminating an EB environment actually takes 30 days to finish, so this charge is a delayed bill for the same, already-terminated environment.</span></div>
+    <div class="opt" data-c="2"><span class="ab">C</span><span>EB environments can only be terminated by AWS support directly, never by the account owner.</span></div>
+    <div class="opt" data-c="3"><span class="ab">D</span><span>The charge is unrelated to AWS entirely — Elastic Beanstalk itself has no billable components at all.</span></div>
+    <div class="quizWhy">Correct answer: <b>A</b>. This is exactly today's cleanup teaching moment — the environment going away doesn't take every resource it created along with it. The auto-created S3 bucket (and sometimes a leftover log group) needs its own separate check.</div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ TAKE-HOME ============ -->
+<section class="blk" id="takehome"><div class="wrap">
+  <div class="secHead"><span class="secNum">TAKE-HOME</span><h2>Three Challenges</h2><span class="secTime">⏱ homework</span></div>
+  <p class="secLede">Today was hands-on in class. The take-home stays hands-on too — on your own account, on your own time.</p>
+
+  <div class="chalCard" id="chal1">
+    <div class="chalHead"><span class="cn">01</span><h4>Write the real least-privilege policy, as actual JSON</h4><span class="chev">›</span></div>
+    <div class="chalBody">
+      <div class="cLabel">Mission</div>
+      <p class="mission">Using SIM 2's checklist as your starting point, write an actual IAM policy document in JSON — scoped to exactly the S3, Elastic Beanstalk, and EC2 actions Blurb Bot's deploy genuinely needs, on exactly today's bucket and environment names, not <code class="k">*</code> wildcards. Attach it to <code class="k">nikhil-deploy</code> in place of the three broad managed policies from §2, and confirm the deploy steps from §4 or §5 still work with it attached.</p>
+    </div>
+  </div>
+  <div class="chalCard" id="chal2">
+    <div class="chalHead"><span class="cn">02</span><h4>Deploy the path you didn't build live in class</h4><span class="chev">›</span></div>
+    <div class="chalBody">
+      <div class="cLabel">Mission</div>
+      <p class="mission">If your table built Path A live, do Path B on your own account this week (or the reverse). Time both the "time to a working URL" and note every decision the path you skipped made for you automatically that the other path made you do by hand. Write three sentences comparing the two, from direct experience, not from today's table.</p>
+    </div>
+  </div>
+  <div class="chalCard" id="chal3">
+    <div class="chalHead"><span class="cn">03</span><h4>Check your own free-tier terms, honestly</h4><span class="chev">›</span></div>
+    <div class="chalBody">
+      <div class="cLabel">Mission</div>
+      <p class="mission">Find your own AWS account's creation date (Billing → Account, or the welcome email) and check which free-tier terms actually apply to it — the classic 12-month allowance, or the newer 6-month credit-based Free Plan from §Setup's note. Screenshot whatever the Billing dashboard's free-tier usage page currently shows for your account and write one sentence stating, in your own words, exactly when your free tier runs out.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ WRAP-UP ============ -->
+<section class="blk" id="wrap"><div class="wrap">
+  <div class="secHead"><span class="secNum">WRAP-UP</span><h2>A Live URL, and a New Question</h2><span class="secTime">⏱ 6 min</span></div>
+
+  <div class="card">
+    <h3>A Day In the Life — Deploying to AWS for the First Time</h3>
+    <div class="prepRow"><b>9:00 AM</b><span>Signs up for AWS, card on file, phone verified, Basic support selected — the account exists, but nothing's been touched with it yet.</span></div>
+    <div class="prepRow"><b>9:20 AM</b><span>Billing alert set first, before anything else — a $1 Budget alarm live before a single resource exists.</span></div>
+    <div class="prepRow"><b>9:45 AM</b><span>Root login used exactly once more, to create <code class="k">nikhil-deploy</code> — then never touched again today.</span></div>
+    <div class="prepRow"><b>11:00 AM</b><span>Blurb Bot live on Elastic Beanstalk, a real URL that returns a real blurb for a real book title.</span></div>
+    <div class="prepRow"><b>12:30 PM</b><span>The same app, live a second time on EC2 — a public IP, a browser-based terminal, no SSH key ever touched.</span></div>
+    <div class="prepRow"><b>1:50 PM</b><span>Everything torn down — instance terminated, environment terminated, both buckets checked and deleted, Billing dashboard rechecked the next morning.</span></div>
+  </div>
+
+  <div class="card">
+    <h3>Things You Can Now Actually Bill For</h3>
+    <table class="tbl">
+      <tr><th>Thing you can now do — or bill for</th><th>Where it came from today</th></tr>
+      <tr><td>Setting up a real spend alert before touching anything else, every single time</td><td>§1</td></tr>
+      <tr><td>Creating a scoped, non-root IAM user and explaining exactly why root shouldn't do daily work</td><td>§2</td></tr>
+      <tr><td>Creating an S3 bucket and correctly exposing exactly one object, safely, on purpose</td><td>§3</td></tr>
+      <tr><td>Shipping a real AI-connected Flask app to Elastic Beanstalk, env vars and all</td><td>§4</td></tr>
+      <tr><td>Launching and connecting to an EC2 instance with zero local SSH key setup</td><td>§5</td></tr>
+      <tr><td>Choosing between EB and EC2 for a given job, from direct hands-on experience, not just theory</td><td>§6</td></tr>
+      <tr><td>Fully tearing a deployment down and confirming, not assuming, that it stopped billing</td><td>§7</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Key Takeaways</h3>
+    <p>1. <b>The billing alarm comes first, always — before the first resource, not after.</b> A $1 Budget alert or a correctly-regioned CloudWatch alarm is the only real safety net a free-tier class has.</p>
+    <p>2. <b>Root is for setup, not for daily work.</b> The very first real action on a new AWS account should be creating a scoped IAM user and never touching root again.</p>
+    <p>3. <b>S3 defaults to private now, on purpose.</b> Public access takes two deliberate steps — and should be scoped to one object, never a whole bucket, especially once real data is involved.</p>
+    <p>4. <b>Elastic Beanstalk and EC2 deployed the identical app today — the difference was never capability.</b> It's how much of the machine underneath you want to manage yourself.</p>
+    <p>5. <b>"Terminated" and "cleaned up" are not the same word.</b> Check what an environment or instance quietly created along the way before calling cleanup done.</p>
+  </div>
+
+  <p class="bigQuote">Blurb Bot is small on purpose — one field, one call, one page. <em>What's not small is that it's the first thing Chapter One has ever put on real cloud infrastructure, with a URL nobody has to be standing at Nikhil's desk to open.</em></p>
+
+  <div class="say">
+    <span class="who">🎙 Instructor Says — Closing</span>
+    <p>"Leave with this one, unresolved on purpose: Blurb Bot is live, on AWS, right now, under one IAM user Nikhil created today. Tara can send the chain's procurement contact a real URL by Friday, exactly what they asked for. But notice what today's setup quietly assumes — <b>exactly one scoped user exists, and it's Nikhil's.</b> The moment this stops being a demo and starts being the real pilot they're evaluating, someone else on Chapter One's side — or on the client's — is going to need their own access, scoped to their own actual job, not Nikhil's login shared around a second time. <b>Who gets the next IAM user, and for what, isn't today's question. That's the one waiting on the other side of Friday's demo going well.</b>"</p>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="wrap">
+  <p><b>Class 23 · AWS for AI Apps — Hands-On Deployment Lab</b> — 5 simulators · 5 checkpoint quizzes</p>
+  <p style="margin-top:6px">— Scaler AIML · verified September 2026 · re-verify AWS free-tier terms, EB platform behavior, and Groq model availability before teaching · real AWS account created and used live</p>
+</div></footer>
+
+<script>
+// ---------- progress bar ----------
+window.addEventListener('scroll', function(){
+  var h = document.documentElement;
+  var pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// ---------- hero counters ----------
+document.querySelectorAll('.hstat .n').forEach(function(el){
+  var target = parseInt(el.getAttribute('data-count'), 10);
+  var cur = 0;
+  var step = Math.max(1, Math.round(target / 20));
+  var t = setInterval(function(){
+    cur += step;
+    if(cur >= target){ cur = target; clearInterval(t); }
+    el.textContent = cur;
+  }, 40);
+});
+
+// ---------- copy-to-clipboard for code blocks ----------
+document.querySelectorAll('.copyBtn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var code = btn.nextElementSibling.innerText;
+    var flash = function(label){
+      btn.textContent = label;
+      btn.classList.toggle('copied', label === 'Copied!');
+      setTimeout(function(){
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 1500);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(code).then(function(){ flash('Copied!'); }).catch(function(){ flash('Copy failed'); });
+    }
+  });
+});
+
+// ---------- chalCard accordion ----------
+document.querySelectorAll('.chalHead').forEach(function(h){
+  h.addEventListener('click', function(){
+    h.parentElement.classList.toggle('open');
+  });
+});
+
+// ---------- generic quiz handler ----------
+document.querySelectorAll('.quiz').forEach(function(quiz){
+  var opts = quiz.querySelectorAll('.opt');
+  var why = quiz.querySelector('.quizWhy');
+  opts.forEach(function(opt){
+    opt.addEventListener('click', function(){
+      if(quiz.classList.contains('answered')) return;
+      quiz.classList.add('answered');
+      opts.forEach(function(o){
+        o.classList.add('locked');
+        if(o.getAttribute('data-c') === '0') o.classList.add('correct');
+        else if(o === opt) o.classList.add('wrong');
+      });
+      why.classList.add('show');
+    });
+  });
+});
+
+// ---------- SIM 1: Build the Billing Alarm in the Right Order ----------
+(function(){
+  var steps = [
+    { id:'pref', label:'Check "Receive Billing Alerts" in Billing preferences, save', order:1 },
+    { id:'nav', label:'Open Billing and Cost Management → Budgets', order:2 },
+    { id:'create', label:'Create a zero-spend / $1 threshold budget', order:3 },
+    { id:'email', label:'Enter your own email as the alert recipient', order:4 },
+    { id:'confirm', label:'Open the confirmation email AWS sends and confirm the subscription', order:5 }
+  ];
+  var shuffled = steps.slice().sort(function(){ return Math.random() - 0.5; });
+  var bank = document.getElementById('s1bank');
+  var orderRow = document.getElementById('s1order');
+  var flash = document.getElementById('s1flash');
+  var resetBtn = document.getElementById('s1reset');
+  var picked = [];
+  var next = 1;
+
+  function render(){
+    bank.innerHTML = '';
+    shuffled.forEach(function(s){
+      var row = document.createElement('div');
+      var cls = 'seqStep';
+      if(picked.indexOf(s.id) !== -1) cls += ' picked';
+      row.className = cls;
+      row.innerHTML = '<span class="seqNum">' + (picked.indexOf(s.id) !== -1 ? '✓' : '?') + '</span><span>' + s.label + '</span>';
+      if(picked.indexOf(s.id) === -1){
+        row.addEventListener('click', function(){ tryPick(s); });
+      }
+      bank.appendChild(row);
+    });
+    orderRow.innerHTML = '';
+    picked.forEach(function(id, i){
+      var s = steps.filter(function(x){ return x.id === id; })[0];
+      var chip = document.createElement('span');
+      chip.className = 'seqOrderChip';
+      chip.textContent = (i + 1) + '. ' + s.label;
+      orderRow.appendChild(chip);
+    });
+  }
+
+  function tryPick(s){
+    if(s.order === next){
+      picked.push(s.id);
+      next++;
+      flash.textContent = next > steps.length ? 'Correct order — the alert is live.' : '';
+      flash.style.color = 'var(--green)';
+    } else {
+      flash.textContent = 'Not yet — that step depends on one that hasn’t happened yet. Try again.';
+      flash.style.color = 'var(--rose)';
+    }
+    render();
+  }
+
+  resetBtn.addEventListener('click', function(){
+    picked = [];
+    next = 1;
+    flash.textContent = '';
+    shuffled = steps.slice().sort(function(){ return Math.random() - 0.5; });
+    render();
+  });
+
+  render();
+})();
+
+// ---------- SIM 2: IAM least-privilege policy builder ----------
+(function(){
+  var perms = [
+    { id:'s3put', label:'s3:PutObject (this bucket only)', needed:true, weight:12 },
+    { id:'s3get', label:'s3:GetObject (this bucket only)', needed:true, weight:12 },
+    { id:'s3del', label:'s3:DeleteBucket (any bucket)', needed:false, weight:-20 },
+    { id:'ebcreate', label:'elasticbeanstalk:CreateEnvironment', needed:true, weight:12 },
+    { id:'ebupdate', label:'elasticbeanstalk:UpdateEnvironment', needed:true, weight:12 },
+    { id:'ec2run', label:'ec2:RunInstances (this account’s VPC)', needed:true, weight:12 },
+    { id:'ec2term', label:'ec2:TerminateInstances', needed:true, weight:12 },
+    { id:'iamcreate', label:'iam:CreateUser (create more IAM users)', needed:false, weight:-20 },
+    { id:'billfull', label:'aws-portal:ModifyBilling (change payment method)', needed:false, weight:-20 },
+    { id:'admin', label:'*:* (full AdministratorAccess)', needed:false, weight:-30 }
+  ];
+  var grid = document.getElementById('s2grid');
+  var bar = document.getElementById('s2bar');
+  var scoreLabel = document.getElementById('s2scoreLabel');
+  var verdict = document.getElementById('s2verdict');
+  var on = {};
+
+  function score(){
+    var total = 0;
+    perms.forEach(function(p){
+      if(on[p.id]) total += p.weight;
+      else if(p.needed) total -= 6;
+    });
+    var maxPossible = 60;
+    var pct = Math.max(0, Math.min(100, Math.round((total / maxPossible) * 100)));
+    bar.style.width = pct + '%';
+    scoreLabel.textContent = pct + ' / 100';
+    bar.className = 'mtFill ' + (pct >= 80 ? 'g' : pct >= 45 ? 't' : 'r');
+    if(pct >= 80){
+      verdict.innerHTML = '<b style="color:var(--green)">Solid.</b> Every needed action checked, nothing extra dragging the score down.';
+    } else if(pct >= 45){
+      verdict.innerHTML = '<b style="color:var(--gold)">Getting there.</b> Either a needed action is still missing, or something unnecessary is checked.';
+    } else {
+      verdict.innerHTML = '<b style="color:var(--rose)">Too broad or too blocked.</b> Compare against what §2’s live task actually required.';
+    }
+  }
+
+  function render(){
+    grid.innerHTML = '';
+    perms.forEach(function(p){
+      var row = document.createElement('div');
+      row.className = 'polRow' + (on[p.id] ? ' on' : '') + (p.needed ? ' needed' : '');
+      row.innerHTML = '<span class="polBox">' + (on[p.id] ? '✓' : '') + '</span><span class="polTxt"><b>' + p.label + '</b></span>';
+      row.addEventListener('click', function(){
+        on[p.id] = !on[p.id];
+        render();
+        score();
+      });
+      grid.appendChild(row);
+    });
+  }
+
+  render();
+  score();
+})();
+
+// ---------- SIM 3: The Bucket, Toggled ----------
+(function(){
+  var objs = [
+    { id:'cover', name:'book-cover-01.jpg', sensitive:false, publicGrant:false },
+    { id:'readme', name:'demo-readme.txt', sensitive:false, publicGrant:false },
+    { id:'members', name:'members-export.csv', sensitive:true, publicGrant:false }
+  ];
+  var bpaOn = true;
+  var objsWrap = document.getElementById('s3objs');
+  var bpaBtn = document.getElementById('s3bpaBtn');
+  var urlTxt = document.getElementById('s3UrlTxt');
+  var urlResult = document.getElementById('s3UrlResult');
+
+  function render(){
+    objsWrap.innerHTML = '';
+    objs.forEach(function(o){
+      var row = document.createElement('div');
+      row.className = 'bucketObj';
+      row.innerHTML =
+        '<div><span class="boName">' + o.name + '</span>' + (o.sensitive ? '<span class="boSens">contains real member data</span>' : '') + '</div>' +
+        '<div style="display:flex;gap:8px;align-items:center">' +
+        '<button class="swBtn' + (o.publicGrant ? ' on' : '') + '" data-grant="' + o.id + '">' + (o.publicGrant ? 'GRANTED' : 'PRIVATE') + '</button>' +
+        '<button class="btn sm ghost" data-test="' + o.id + '">Test URL</button>' +
+        '</div>';
+      objsWrap.appendChild(row);
+    });
+    objsWrap.querySelectorAll('[data-grant]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-grant');
+        objs.forEach(function(o){ if(o.id === id) o.publicGrant = !o.publicGrant; });
+        render();
+      });
+    });
+    objsWrap.querySelectorAll('[data-test]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-test');
+        var o = objs.filter(function(x){ return x.id === id; })[0];
+        testUrl(o);
+      });
+    });
+    bpaBtn.textContent = bpaOn ? 'ON' : 'OFF';
+    bpaBtn.className = 'swBtn' + (bpaOn ? ' on' : '');
+  }
+
+  function testUrl(o){
+    urlTxt.textContent = 'https://demo-bucket.s3.amazonaws.com/' + o.name;
+    if(bpaOn){
+      urlResult.textContent = '403 Access Denied (Block Public Access is ON)';
+      urlResult.className = 's3Result deny403';
+    } else if(!o.publicGrant){
+      urlResult.textContent = '403 Access Denied (no public grant on this object)';
+      urlResult.className = 's3Result deny403';
+    } else if(o.sensitive){
+      urlResult.textContent = '200 OK — but this is real member data, now publicly reachable by anyone with the link. That’s a leak, not a feature.';
+      urlResult.className = 's3Result leak';
+    } else {
+      urlResult.textContent = '200 OK — loads correctly, safely, on purpose.';
+      urlResult.className = 's3Result ok200';
+    }
+  }
+
+  bpaBtn.addEventListener('click', function(){
+    bpaOn = !bpaOn;
+    render();
+  });
+
+  render();
+})();
+
+// ---------- SIM 4: Pick the Path, Watch the Free-Tier Dial ----------
+(function(){
+  var scenarios = [
+    { id:'sc1', txt:'Get Blurb Bot online today with the smallest number of manual steps possible — nobody wants to hand-patch a server.', best:'eb', ebHours:1.5, ecHours:0.5 },
+    { id:'sc2', txt:'Ravi wants to SSH-free into the exact machine and install a custom monitoring agent nothing standard supports.', best:'ec2', ebHours:1.5, ecHours:0.5 },
+    { id:'sc3', txt:'A five-minute proof-of-concept for tomorrow’s stand-up — speed to a URL matters more than anything else.', best:'eb', ebHours:1.5, ecHours:0.5 },
+    { id:'sc4', txt:'Full control over exactly which OS packages are installed, for a script only Ravi will ever touch.', best:'ec2', ebHours:1.5, ecHours:0.5 },
+    { id:'sc5', txt:'Nikhil is out sick and Tara has to redeploy solo from a one-page checklist — fewest decisions to get wrong.', best:'eb', ebHours:1.5, ecHours:0.5 }
+  ];
+  var wrap = document.getElementById('s4scenarios');
+  var hoursBar = document.getElementById('s4hoursBar');
+  var hoursLabel = document.getElementById('s4hoursLabel');
+  var totalHours = 0;
+  var maxHours = scenarios.length * 1.5;
+
+  function render(){
+    wrap.innerHTML = '';
+    scenarios.forEach(function(s){
+      var card = document.createElement('div');
+      card.className = 'pathScenCard';
+      card.innerHTML =
+        '<div class="pscTxt">' + s.txt + '</div>' +
+        '<div class="pathBtnRow">' +
+        '<button class="pathBtn" data-sc="' + s.id + '" data-choice="eb">Elastic Beanstalk</button>' +
+        '<button class="pathBtn" data-sc="' + s.id + '" data-choice="ec2">EC2</button>' +
+        '</div><div class="pscWhy" id="why-' + s.id + '"></div>';
+      wrap.appendChild(card);
+    });
+    wrap.querySelectorAll('.pathBtn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var scId = btn.getAttribute('data-sc');
+        var choice = btn.getAttribute('data-choice');
+        var s = scenarios.filter(function(x){ return x.id === scId; })[0];
+        var card = btn.closest('.pathScenCard');
+        if(card.classList.contains('locked')) return;
+        card.classList.add('locked');
+        card.querySelectorAll('.pathBtn').forEach(function(b){
+          b.disabled = true;
+          var bChoice = b.getAttribute('data-choice');
+          if(bChoice === s.best) b.classList.add('chosen', 'good');
+          else if(bChoice === choice) b.classList.add('chosen', 'bad');
+        });
+        var why = card.querySelector('.pscWhy');
+        why.classList.add('show');
+        why.innerHTML = choice === s.best
+          ? '<b style="color:var(--green)">Matches.</b> That’s the right trade for this ask.'
+          : '<b style="color:var(--rose)">The other one fits better here —</b> reread what this scenario actually asks for.';
+        totalHours += choice === 'eb' ? s.ebHours : s.ecHours;
+        var pct = Math.min(100, Math.round((totalHours / maxHours) * 100));
+        hoursBar.style.width = pct + '%';
+        hoursLabel.textContent = totalHours.toFixed(1) + ' hrs';
+      });
+    });
+  }
+
+  render();
+})();
+
+// ---------- SIM 5: Tear It All Down ----------
+(function(){
+  var rows = [
+    { id:'ec2', name:'EC2 t3.micro instance (blurb-bot-ec2)', cost:7.50 },
+    { id:'eb', name:'Elastic Beanstalk environment (EC2 + load balancer underneath)', cost:16.00 },
+    { id:'ebs3', name:'EB’s auto-created S3 bucket (app versions + logs)', cost:0.50 },
+    { id:'demo', name:'Demo S3 bucket from §3', cost:0.10 },
+    { id:'eip', name:'An unattached Elastic IP left allocated', cost:3.60 }
+  ];
+  var wrap = document.getElementById('s5rows');
+  var totalEl = document.getElementById('s5total');
+  var done = {};
+
+  function render(){
+    wrap.innerHTML = '';
+    rows.forEach(function(r){
+      var row = document.createElement('div');
+      row.className = 'cleanRow' + (done[r.id] ? ' done' : '');
+      row.innerHTML =
+        '<div class="clTxt"><b>' + r.name + '</b>' + (done[r.id] ? 'Cleaned up' : 'Still running') + '</div>' +
+        '<div class="clCost">$' + r.cost.toFixed(2) + '/mo</div>';
+      row.addEventListener('click', function(){
+        done[r.id] = !done[r.id];
+        render();
+      });
+      wrap.appendChild(row);
+    });
+    var total = 0;
+    rows.forEach(function(r){ if(!done[r.id]) total += r.cost; });
+    totalEl.textContent = '$' + total.toFixed(2);
+    totalEl.className = 'cmVal' + (total === 0 ? ' zero' : '');
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
