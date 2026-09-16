@@ -387,6 +387,7 @@ pre.code .kw{color:var(--orange2)}
   </div>
 
   <div class="note beg"><b>Say this out loud before starting:</b> a card on file is not the same thing as a charge. Every single service used today — IAM, S3 at this file size, one small EB environment, one t3.micro EC2 instance for under two hours — sits inside AWS's free allowances when torn down the same day, per §8's cleanup steps. The card exists because AWS requires one for identity and fraud-prevention purposes on every account, free tier or not.</div>
+  <div class="note pro"><b>Hands-on lab link:</b> we will use this link to practice the hands-on — <a href="https://www.scaler.com/admin/new_problems/315757/#/validate_linux_lab" target="_blank" rel="noopener">scaler.com/admin/new_problems/315757/#/validate_linux_lab</a>.</div>
   <div class="note adv"><b>Instructor — before you teach this live:</b> AWS changed its free-tier structure on <b>July 15, 2025</b>. Accounts created <i>before</i> that date still get the classic 12-month free tier (roughly 750 EC2 t2.micro/t3.micro hours a month, among other allowances). Accounts created <i>after</i> that date instead get a 6-month, credit-based "Free Plan" (around $100 signup credit, plus up to $100 more for using certain services) that expires on whichever comes first — 6 months, or the credits running out. If anyone in the room is signing up fresh today, say this out loud: their free tier is genuinely not the same deal as an older account's, and re-verify the exact current numbers at <a href="https://aws.amazon.com/free" target="_blank" rel="noopener">aws.amazon.com/free</a> the night before you teach this, the same way Class 21 re-verified Railway's pricing before it changed too.</div>
 </div></section>
 
@@ -813,7 +814,7 @@ client = OpenAI(
 
   <div class="say">
     <span class="who">🎙 Instructor Says — Closing</span>
-    <p>"Leave with this one, unresolved on purpose: Blurb Bot is live, on AWS, right now, under one IAM user Nikhil created today. Tara can send the chain's procurement contact a real URL by Friday, exactly what they asked for. But notice what today's setup quietly assumes — <b>exactly one scoped user exists, and it's Nikhil's.</b> The moment this stops being a demo and starts being the real pilot they're evaluating, someone else on Chapter One's side — or on the client's — is going to need their own access, scoped to their own actual job, not Nikhil's login shared around a second time. <b>Who gets the next IAM user, and for what, isn't today's question. That's the one waiting on the other side of Friday's demo going well.</b>"</p>
+    <p>"Blurb Bot is live, on AWS, right now, under one IAM user Nikhil created today. Tara can send the chain's procurement contact a real URL by Friday, exactly what they asked for. That's where Chapter One's story ends for this course — from a shelf-talker file in Class 17 to a real app, on real cloud infrastructure, with a real address nobody has to be standing at Nikhil's desk to open. Everything after this — more users, a bigger migration, the real pilot — is Chapter One's to figure out on their own."</p>
   </div>
 </div></section>
 
